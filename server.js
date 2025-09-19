@@ -1,6 +1,7 @@
 const express = require('express');
 const dotenv = require('dotenv');
 const cors = require('cors');
+const path = require('path');
 
 // Custom Modules
 const connectDB = require('./config/db');
@@ -25,6 +26,7 @@ app.get('/', (req, res) => {
 });
 
 app.use('/api/auth', require('./routes/auth.routes'));
+app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 app.use('/api/project',  require('./routes/project.routes'));
 
 // Global Error Handler

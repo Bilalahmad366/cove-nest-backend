@@ -8,13 +8,17 @@ const projectSchema = new mongoose.Schema(
     location: { type: String, required: true },
     plan_status: { type: String, required: true },
     property_type: { type: String, required: true },
-    size: { type: String, required: true },
+    area: { type: String, required: true },
     min_price: { type: Number, required: true },
     max_price: { type: Number, required: true },
-    handover: {
-      from: { type: Date },
-      to: { type: Date },
+    handover: { type: String, required: true },
+    bedrooms: { type: String }, 
+    size: { type: String , required: true  }, 
+    images: [
+    {
+      type: String, 
     },
+  ],
      createdBy: { type: mongoose.Schema.Types.ObjectId, ref: "User", required: true },
   },
   { timestamps: true }
