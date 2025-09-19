@@ -21,10 +21,11 @@ app.use(express.json());
 
 // Routes
 app.get('/', (req, res) => {
-  res.send('Inventory SaaS API is running');
+  res.send('cove nest apis is running ');
 });
 
 app.use('/api/auth', require('./routes/auth.routes'));
+app.use('/api/project',  require('./routes/project.routes'));
 
 // Global Error Handler
 app.use(errorHandler);
