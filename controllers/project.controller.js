@@ -1,4 +1,24 @@
 const projectService = require("../services/project.service");
+
+const getAllPublicProjects = async (req, res) => {
+  try {
+    const projects = await projectService.getAllPublicProjects();
+    res.json(projects);
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+};
+
+const filterProjects = async (req, res) => {
+  try {
+    const projects = await projectService.filterProjects(req.body);
+    res.json(projects);
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+};
+
+
 const createProject = async (req, res) => {
   try {
     const images = req.files ? req.files.map((file) => file.path) : [];
@@ -18,7 +38,6 @@ const updateProject = async (req, res) => {
     const projectId = req.params.id;
     const userId = req.user.id;
 
-    // Purane images (URLs) jo frontend se aayengi
     let oldImages = [];
     if (req.body.existingImages) {
       oldImages = Array.isArray(req.body.existingImages)
@@ -26,13 +45,11 @@ const updateProject = async (req, res) => {
         : [req.body.existingImages];
     }
 
-    // Naye images (multer se)
     let newImages = [];
     if (req.files && req.files.length > 0) {
       newImages = req.files.map((file) => file.path.replace(/\\/g, "/"));
     }
 
-    // Final data pass to service
     const data = { ...req.body, images: oldImages, newImages };
 
     const project = await projectService.updateProject(projectId, data, userId);
@@ -87,4 +104,6 @@ module.exports = {
   getProjectById,
   updateProject,
   deleteProject,
+  getAllPublicProjects,
+  filterProjects,
 };
