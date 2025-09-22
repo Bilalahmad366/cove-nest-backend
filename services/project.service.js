@@ -8,34 +8,67 @@ const getAllPublicProjects = async () => {
 const filterProjects = async (filters) => {
   const query = {};
 
-  // Areas
-  if (filters.areas && filters.areas.length > 0) {
-    query.location = { $in: filters.areas };
+
+  if (Array.isArray(filters.developer) && filters.developer.length > 0) {
+    query.developer_name = {
+      $in: filters.developer
+        .filter(d => d && d.trim() !== "")
+        .map(d => new RegExp(`^${d.trim()}$`, "i"))
+    };
   }
 
-  // Developers
-  if (filters.developers && filters.developers.length > 0) {
-    query.developer_name = { $in: filters.developers };
+  if (Array.isArray(filters.area) && filters.area.length > 0) {
+    query.area = {
+      $in: filters.area
+        .filter(a => a && a.trim() !== "")
+        .map(a => new RegExp(`^${a.trim()}$`, "i"))
+    };
   }
 
-  // Handover
-  if (filters.handover && filters.handover.length > 0) {
-    query.handover = { $in: filters.handover };
+  if (Array.isArray(filters.handover) && filters.handover.length > 0) {
+    query.handover = {
+      $in: filters.handover
+        .filter(h => h && h.trim() !== "")
+        .map(h => new RegExp(`^${h.trim()}$`, "i"))
+    };
   }
 
-  // Property Types
-  if (filters.propertyTypes && filters.propertyTypes.length > 0) {
-    query.property_type = { $in: filters.propertyTypes };
+  if (Array.isArray(filters.propertyTypes) && filters.propertyTypes.length > 0) {
+    query.property_type = {
+      $in: filters.propertyTypes
+        .filter(p => p && p.trim() !== "")
+        .map(p => new RegExp(`^${p.trim()}$`, "i"))
+    };
   }
 
-  // Price Range
-  if (filters.priceMin || filters.priceMax) {
-    query.min_price = { $gte: filters.priceMin || 0 };
-    query.max_price = { $lte: filters.priceMax || Number.MAX_SAFE_INTEGER };
+  const min = filters.priceMin && !isNaN(filters.priceMin) ? Number(filters.priceMin) : null;
+  const max = filters.priceMax && !isNaN(filters.priceMax) ? Number(filters.priceMax) : null;
+
+  if (min !== null || max !== null) {
+    query.min_price = { $gte: min || 0 };
+    query.max_price = { $lte: max || Number.MAX_SAFE_INTEGER };
+  }
+
+   if (filters.category && filters.category.trim() !== "") {
+    query.category = new RegExp(`^${filters.category.trim()}$`, "i");
+  }
+
+  // ✅ Best Area (boolean)
+  if (typeof filters.isBestArea === "boolean") {
+    query.isBestArea = filters.isBestArea;
+  }
+
+  if (Array.isArray(filters.plan_status) && filters.plan_status.length > 0) {
+    query.plan_status = {
+      $in: filters.plan_status
+        .filter(p => p && p.trim() !== "")
+        .map(p => new RegExp(`^${p.trim()}$`, "i"))
+    };
   }
 
   return await Project.find(query).sort({ createdAt: -1 });
 };
+
 
 
 const createProject = async (data) => {
@@ -48,6 +81,7 @@ const createProject = async (data) => {
 
   return await project.save();
 };
+
 
 const updateProject = async (id, data, userId) => {
   const {
@@ -65,12 +99,14 @@ const updateProject = async (id, data, userId) => {
     bedrooms,
     images,
     newImages,
+    category,
+    isBestArea,
   } = data;
-
 
   const project = await Project.findOne({ _id: id, createdBy: userId });
   if (!project) return null;
 
+  // remove old images
   const removedImages = project.images.filter((img) => !images.includes(img));
   removedImages.forEach((img) => {
     const filePath = path.join(__dirname, "..", img);
@@ -82,7 +118,6 @@ const updateProject = async (id, data, userId) => {
       }
     });
   });
-
 
   const updateData = {
     project_name,
@@ -97,12 +132,13 @@ const updateProject = async (id, data, userId) => {
     handover,
     bedrooms,
     size,
+    category: category ,
+    isBestArea: typeof isBestArea === "boolean" ? isBestArea : project.isBestArea,
     images: [
       ...(images || []),
       ...(newImages || []),
     ],
   };
-
 
   return await Project.findOneAndUpdate(
     { _id: id, createdBy: userId },

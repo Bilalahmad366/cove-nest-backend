@@ -12,14 +12,20 @@ const projectSchema = new mongoose.Schema(
     min_price: { type: Number, required: true },
     max_price: { type: Number, required: true },
     handover: { type: String, required: true },
-    bedrooms: { type: String }, 
-    size: { type: String , required: true  }, 
+    bedrooms: { type: String },
+    size: { type: String, required: true },
     images: [
-    {
-      type: String, 
+      {
+        type: String,
+      },
+    ],
+    category: { type: String },
+    isBestArea: {
+      type: Boolean,
+      default: false,
     },
-  ],
-     createdBy: { type: mongoose.Schema.Types.ObjectId, ref: "User", required: true },
+
+    createdBy: { type: mongoose.Schema.Types.ObjectId, ref: "User", required: true },
   },
   { timestamps: true }
 );
