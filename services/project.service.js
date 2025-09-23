@@ -100,7 +100,9 @@ const updateProject = async (id, data, userId) => {
     images,
     newImages,
     category,
+    description,
     isBestArea,
+    amenities
   } = data;
 
   const project = await Project.findOne({ _id: id, createdBy: userId });
@@ -133,6 +135,8 @@ const updateProject = async (id, data, userId) => {
     bedrooms,
     size,
     category: category ,
+    description: description ,
+    amenities: amenities ,
     isBestArea: typeof isBestArea === "boolean" ? isBestArea : project.isBestArea,
     images: [
       ...(images || []),

@@ -12,7 +12,8 @@ const projectSchema = new mongoose.Schema(
     min_price: { type: Number, required: true },
     max_price: { type: Number, required: true },
     handover: { type: String, required: true },
-    bedrooms: { type: String },
+    amenities: [{ type: String, }],
+    description: { type: String },
     size: { type: String, required: true },
     images: [
       {
