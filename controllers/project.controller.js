@@ -9,6 +9,16 @@ const getAllPublicProjects = async (req, res) => {
   }
 };
 
+const getProjectByIdPublic = async (req, res) => {
+  try {
+    const project = await projectService.getProjectByIdPublic(req.params.id);
+    if (!project) return res.status(404).json({ message: "Project not found" });
+    res.json(project);
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+};
+
 const filterProjects = async (req, res) => {
   try {
     const projects = await projectService.filterProjects(req.body);
@@ -57,7 +67,7 @@ const updateProject = async (req, res) => {
     if (!project)
       return res.status(404).json({ message: "Project not found or not yours" });
 
-    
+
     res.json(project);
   } catch (err) {
     res.status(400).json({ message: err.message });
@@ -106,4 +116,5 @@ module.exports = {
   deleteProject,
   getAllPublicProjects,
   filterProjects,
+  getProjectByIdPublic,
 };

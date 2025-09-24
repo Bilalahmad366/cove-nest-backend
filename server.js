@@ -28,6 +28,8 @@ app.get('/', (req, res) => {
 app.use('/api/auth', require('./routes/auth.routes'));
 app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 app.use('/api/project',  require('./routes/project.routes'));
+app.use('/api/news',  require('./routes/news.routes'));
+app.use('/api/event',  require('./routes/event.routes'));
 
 // Global Error Handler
 app.use(errorHandler);

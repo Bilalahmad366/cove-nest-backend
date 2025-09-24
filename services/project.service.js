@@ -5,6 +5,12 @@ const path = require("path");
 const getAllPublicProjects = async () => {
   return await Project.find().sort({ createdAt: -1 });
 };
+
+const getProjectByIdPublic = async (id) => {
+  return await Project.findById(id);
+};
+
+
 const filterProjects = async (filters) => {
   const query = {};
 
@@ -49,7 +55,7 @@ const filterProjects = async (filters) => {
     query.max_price = { $lte: max || Number.MAX_SAFE_INTEGER };
   }
 
-   if (filters.category && filters.category.trim() !== "") {
+  if (filters.category && filters.category.trim() !== "") {
     query.category = new RegExp(`^${filters.category.trim()}$`, "i");
   }
 
@@ -134,9 +140,9 @@ const updateProject = async (id, data, userId) => {
     handover,
     bedrooms,
     size,
-    category: category ,
-    description: description ,
-    amenities: amenities ,
+    category: category,
+    description: description,
+    amenities: amenities,
     isBestArea: typeof isBestArea === "boolean" ? isBestArea : project.isBestArea,
     images: [
       ...(images || []),
@@ -190,4 +196,5 @@ module.exports = {
   deleteProject,
   getAllPublicProjects,
   filterProjects,
+  getProjectByIdPublic,
 };
