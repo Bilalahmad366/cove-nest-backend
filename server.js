@@ -30,6 +30,9 @@ app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 app.use('/api/project',  require('./routes/project.routes'));
 app.use('/api/news',  require('./routes/news.routes'));
 app.use('/api/event',  require('./routes/event.routes'));
+app.use('/api/blog',  require('./routes/blog.routes'));
+app.use('/api/videos',  require('./routes/video.routes'));
+app.use('/api/faq',  require('./routes/Faq.routes'));
 
 // Global Error Handler
 app.use(errorHandler);
