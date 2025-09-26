@@ -28,7 +28,13 @@ const createEvents = async (req, res) => {
       description: req.body.description,
       date: req.body.date,
       location: req.body.location,
+
+      // ✅ Cloudinary se direct URL
+      // image: req.file.path,
+
+      // ❌ Local storage (commented)
       image: req.file.path.replace(/\\/g, "/"),
+
       createdBy: req.user.id,
     };
 
@@ -68,6 +74,10 @@ const updateEvents = async (req, res) => {
     };
 
     if (req.file) {
+      // ✅ Cloudinary URL
+      // updateData.image = req.file.path;
+
+      // ❌ Local storage (commented)
       updateData.image = req.file.path.replace(/\\/g, "/");
     }
 

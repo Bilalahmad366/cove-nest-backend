@@ -34,3 +34,27 @@ const upload = multer({
 });
 
 module.exports = upload;
+
+
+// Cloudinary version (commented)
+
+// const multer = require("multer");
+// const { CloudinaryStorage } = require("multer-storage-cloudinary");
+// const cloudinary = require("../config/cloudinary");
+
+// // Cloudinary storage config
+// const storage = new CloudinaryStorage({
+//   cloudinary: cloudinary,
+//   params: {
+//     folder: "projects_uploads", // Cloudinary folder name
+//     allowed_formats: ["jpg", "jpeg", "png"],
+//   },
+// });
+
+// // Multer instance (Cloudinary par upload karega)
+// const upload = multer({
+//   storage: storage,
+//   limits: { fileSize: 5 * 1024 * 1024 }, // max 5MB
+// });
+
+// module.exports = upload;

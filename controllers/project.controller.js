@@ -29,13 +29,20 @@ const filterProjects = async (req, res) => {
 };
 
 
+
+// 🟢 Create project
 const createProject = async (req, res) => {
   try {
-    const images = req.files ? req.files.map((file) => file.path) : [];
+    // Local upload (OLD)
+     const images = req.files ? req.files.map((file) => file.path) : [];
+     // Cloudinary upload (NEW)
+    // const images = req.files ? req.files.map((file) => file.path) : [];
+
     const data = { ...req.body, createdBy: req.user.id, images };
     if (req.files && req.files.length > 0) {
       data.images = req.files.map(file => file.path.replace(/\\/g, "/"));
     }
+
     const project = await projectService.createProject(data);
     res.status(201).json(project);
   } catch (err) {
@@ -43,6 +50,7 @@ const createProject = async (req, res) => {
   }
 };
 
+// 🟢 Update project
 const updateProject = async (req, res) => {
   try {
     const projectId = req.params.id;
@@ -57,24 +65,26 @@ const updateProject = async (req, res) => {
 
     let newImages = [];
     if (req.files && req.files.length > 0) {
+      // Local upload (OLD)
       newImages = req.files.map((file) => file.path.replace(/\\/g, "/"));
+
+      // Cloudinary upload (NEW)
+      // newImages = req.files.map((file) => file.path);
     }
 
-    const data = { ...req.body, images: oldImages, newImages };
+    // Merge old + new
+    const data = { ...req.body, images: [...oldImages, ...newImages] };
 
     const project = await projectService.updateProject(projectId, data, userId);
 
     if (!project)
       return res.status(404).json({ message: "Project not found or not yours" });
 
-
     res.json(project);
   } catch (err) {
     res.status(400).json({ message: err.message });
   }
 };
-
-
 
 const getAllProjects = async (req, res) => {
   try {
