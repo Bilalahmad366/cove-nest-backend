@@ -34,9 +34,9 @@ const filterProjects = async (req, res) => {
 const createProject = async (req, res) => {
   try {
     // Local upload (OLD)
-     const images = req.files ? req.files.map((file) => file.path) : [];
+    //  const images = req.files ? req.files.map((file) => file.path) : [];
      // Cloudinary upload (NEW)
-    // const images = req.files ? req.files.map((file) => file.path) : [];
+    const images = req.files ? req.files.map((file) => file.path) : [];
 
     const data = { ...req.body, createdBy: req.user.id, images };
     if (req.files && req.files.length > 0) {
@@ -66,10 +66,10 @@ const updateProject = async (req, res) => {
     let newImages = [];
     if (req.files && req.files.length > 0) {
       // Local upload (OLD)
-      newImages = req.files.map((file) => file.path.replace(/\\/g, "/"));
+      // newImages = req.files.map((file) => file.path.replace(/\\/g, "/"));
 
       // Cloudinary upload (NEW)
-      // newImages = req.files.map((file) => file.path);
+      newImages = req.files.map((file) => file.path);
     }
 
     // Merge old + new

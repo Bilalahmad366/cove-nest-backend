@@ -29,10 +29,10 @@ const createNews = async (req, res) => {
       date: req.body.date || new Date(),
 
       // ✅ Cloudinary se direct URL save hoga
-      // image: req.file.path,
+      image: req.file.path,
 
       // ❌ Local storage version (commented)
-      image: req.file.path.replace(/\\/g, "/"),
+      // image: req.file.path.replace(/\\/g, "/"),
 
       createdBy: req.user.id,
     };
@@ -73,10 +73,10 @@ const updateNews = async (req, res) => {
 
     if (req.file) {
       // ✅ Cloudinary image URL
-      // updateData.image = req.file.path;
+      updateData.image = req.file.path;
 
       // ❌ Local storage version (commented)
-      updateData.image = req.file.path.replace(/\\/g, "/");
+      // updateData.image = req.file.path.replace(/\\/g, "/");
     }
 
     const news = await newsService.updateNews(

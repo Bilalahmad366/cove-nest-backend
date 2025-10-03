@@ -30,10 +30,10 @@ const createEvents = async (req, res) => {
       location: req.body.location,
 
       // ✅ Cloudinary se direct URL
-      // image: req.file.path,
+      image: req.file.path,
 
       // ❌ Local storage (commented)
-      image: req.file.path.replace(/\\/g, "/"),
+      // image: req.file.path.replace(/\\/g, "/"),
 
       createdBy: req.user.id,
     };
@@ -75,10 +75,10 @@ const updateEvents = async (req, res) => {
 
     if (req.file) {
       // ✅ Cloudinary URL
-      // updateData.image = req.file.path;
+      updateData.image = req.file.path;
 
       // ❌ Local storage (commented)
-      updateData.image = req.file.path.replace(/\\/g, "/");
+      // updateData.image = req.file.path.replace(/\\/g, "/");
     }
 
     const events = await eventService.updateEvents(
