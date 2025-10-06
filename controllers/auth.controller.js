@@ -17,3 +17,14 @@ exports.login = async (req, res, next) => {
     next(err);
   }
 };
+
+
+exports.verifyByEmail = async (req, res) => {
+  try {
+    const email = req.query.email;
+    const result = await authService.verifyUserByEmail(email);
+    res.status(200).json({ success: true, data: result });
+  } catch (err) {
+    res.status(400).json({ success: false, message: err.message });
+  }
+};
