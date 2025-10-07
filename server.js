@@ -33,6 +33,7 @@ app.use('/api/event',  require('./routes/event.routes'));
 app.use('/api/blog',  require('./routes/blog.routes'));
 app.use('/api/videos',  require('./routes/video.routes'));
 app.use('/api/faq',  require('./routes/Faq.routes'));
+app.use('/api/experts',  require('./routes/expert.routes'));
 
 // Global Error Handler
 app.use(errorHandler);
