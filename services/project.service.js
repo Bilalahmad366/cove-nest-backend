@@ -16,10 +16,11 @@ const filterProjects = async (filters) => {
 
 
   if (Array.isArray(filters.developer) && filters.developer.length > 0) {
+
     query.developer_name = {
       $in: filters.developer
         .filter(d => d && d.trim() !== "")
-        .map(d => new RegExp(`^${d.trim()}$`, "i"))
+        .map(d => new RegExp(d.trim().replace(/\s+/g, '\\s*'), "i"))  // flexible spacing
     };
   }
 
@@ -27,7 +28,8 @@ const filterProjects = async (filters) => {
     query.area = {
       $in: filters.area
         .filter(a => a && a.trim() !== "")
-        .map(a => new RegExp(`^${a.trim()}$`, "i"))
+        // .map(a => new RegExp(`^${a.trim()}$`, "i"))
+        .map(a => new RegExp(a.trim().replace(/\s+/g, '\\s*'), "i"))  // flexible spacing
     };
   }
 
@@ -35,7 +37,8 @@ const filterProjects = async (filters) => {
     query.handover = {
       $in: filters.handover
         .filter(h => h && h.trim() !== "")
-        .map(h => new RegExp(`^${h.trim()}$`, "i"))
+        // .map(h => new RegExp(`^${h.trim()}$`, "i"))
+        .map(h => new RegExp(h.trim().replace(/\s+/g, '\\s*'), "i"))  // flexible spacing
     };
   }
 
@@ -43,7 +46,8 @@ const filterProjects = async (filters) => {
     query.property_type = {
       $in: filters.propertyTypes
         .filter(p => p && p.trim() !== "")
-        .map(p => new RegExp(`^${p.trim()}$`, "i"))
+        // .map(p => new RegExp(`^${p.trim()}$`, "i"))
+        .map(p => new RegExp(p.trim().replace(/\s+/g, '\\s*'), "i"))  // flexible spacing
     };
   }
 
@@ -68,13 +72,13 @@ const filterProjects = async (filters) => {
     query.plan_status = {
       $in: filters.plan_status
         .filter(p => p && p.trim() !== "")
-        .map(p => new RegExp(`^${p.trim()}$`, "i"))
+        // .map(p => new RegExp(`^${p.trim()}$`, "i"))
+        .map(p => new RegExp(p.trim().replace(/\s+/g, '\\s*'), "i"))  // flexible spacing
     };
   }
 
   return await Project.find(query).sort({ createdAt: -1 });
 };
-
 
 
 const createProject = async (data) => {
