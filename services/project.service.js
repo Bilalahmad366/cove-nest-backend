@@ -95,6 +95,8 @@ const createProject = async (data) => {
 
 const updateProject = async (id, data, userId) => {
   const {
+    about_points,
+    about_overview,
     project_name,
     developer_name,
     location,
@@ -112,13 +114,14 @@ const updateProject = async (id, data, userId) => {
     category,
     description,
     isBestArea,
-    amenities
+    amenities,
+    payment_plans, // ✅ Add this
   } = data;
 
   const project = await Project.findOne({ _id: id, createdBy: userId });
   if (!project) return null;
 
-  // remove old images
+  // 🧹 Remove old images
   const removedImages = project.images.filter((img) => !images.includes(img));
   removedImages.forEach((img) => {
     const filePath = path.join(__dirname, "..", img);
@@ -131,8 +134,11 @@ const updateProject = async (id, data, userId) => {
     });
   });
 
+  // 🧩 Update data
   const updateData = {
     project_name,
+    about_points,
+    about_overview,
     developer_name,
     location,
     city,
@@ -144,22 +150,23 @@ const updateProject = async (id, data, userId) => {
     handover,
     bedrooms,
     size,
-    category: category,
-    description: description,
-    amenities: amenities,
-    isBestArea: typeof isBestArea === "boolean" ? isBestArea : project.isBestArea,
-    images: [
-      ...(images || []),
-      ...(newImages || []),
-    ],
+    category,
+    description,
+    amenities,
+    payment_plans: payment_plans || project.payment_plans, // ✅ Fix added here
+    isBestArea:
+      typeof isBestArea === "boolean" ? isBestArea : project.isBestArea,
+    images: [...(images || []), ...(newImages || [])],
   };
 
+  // ✅ Use $set so nested fields overwrite properly
   return await Project.findOneAndUpdate(
     { _id: id, createdBy: userId },
     { $set: updateData },
-    { new: true }
+    { new: true, runValidators: true }
   );
 };
+
 
 
 const getAllProjects = async (userId) => {

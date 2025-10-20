@@ -35,7 +35,12 @@ const createProject = async (req, res) => {
   try {
     // Local upload (OLD)
     //  const images = req.files ? req.files.map((file) => file.path) : [];
-     // Cloudinary upload (NEW)
+    // Cloudinary upload (NEW)
+
+    // 🟢 Parse payment_plans if JSON string
+    if (req.body.payment_plans) {
+      req.body.payment_plans = JSON.parse(req.body.payment_plans);
+    }
     const images = req.files ? req.files.map((file) => file.path) : [];
 
     const data = { ...req.body, createdBy: req.user.id, images };
@@ -53,78 +58,88 @@ const createProject = async (req, res) => {
 // 🟢 Update project
 const updateProject = async (req, res) => {
   try {
-    const projectId = req.params.id;
-    const userId = req.user.id;
-
-    let oldImages = [];
-    if (req.body.existingImages) {
-      oldImages = Array.isArray(req.body.existingImages)
-        ? req.body.existingImages
-        : [req.body.existingImages];
+  if (req.body.payment_plans) {
+  try {
+    // Agar string hai to parse karo
+    if (typeof req.body.payment_plans === "string") {
+      req.body.payment_plans = JSON.parse(req.body.payment_plans);
     }
+  } catch (err) {
+    console.warn("Failed to parse payment_plans:", err.message);
+  }
+}
+      const projectId = req.params.id;
+      const userId = req.user.id;
 
-    let newImages = [];
-    if (req.files && req.files.length > 0) {
-      // Local upload (OLD)
-      // newImages = req.files.map((file) => file.path.replace(/\\/g, "/"));
+      let oldImages = [];
+      if (req.body.existingImages) {
+        oldImages = Array.isArray(req.body.existingImages)
+          ? req.body.existingImages
+          : [req.body.existingImages];
+      }
 
-      // Cloudinary upload (NEW)
-      newImages = req.files.map((file) => file.path);
+      let newImages = [];
+      if (req.files && req.files.length > 0) {
+        // Local upload (OLD)
+        // newImages = req.files.map((file) => file.path.replace(/\\/g, "/"));
+
+        // Cloudinary upload (NEW)
+        newImages = req.files.map((file) => file.path);
+      }
+
+      // Merge old + new
+      const data = { ...req.body, images: [...oldImages, ...newImages] };
+
+      const project = await projectService.updateProject(projectId, data, userId);
+
+      if (!project)
+        return res.status(404).json({ message: "Project not found or not yours" });
+
+      res.json(project);
+    } catch (err) {
+      res.status(400).json({ message: err.message });
     }
+  };
 
-    // Merge old + new
-    const data = { ...req.body, images: [...oldImages, ...newImages] };
+  const getAllProjects = async (req, res) => {
+    try {
+      const projects = await projectService.getAllProjects(req.user.id);
+      res.json(projects);
+    } catch (err) {
+      res.status(500).json({ message: err.message });
+    }
+  };
 
-    const project = await projectService.updateProject(projectId, data, userId);
-
-    if (!project)
-      return res.status(404).json({ message: "Project not found or not yours" });
-
-    res.json(project);
-  } catch (err) {
-    res.status(400).json({ message: err.message });
-  }
-};
-
-const getAllProjects = async (req, res) => {
-  try {
-    const projects = await projectService.getAllProjects(req.user.id);
-    res.json(projects);
-  } catch (err) {
-    res.status(500).json({ message: err.message });
-  }
-};
-
-const getProjectById = async (req, res) => {
-  try {
-    const project = await projectService.getProjectById(req.params.id, req.user.id);
-    if (!project) return res.status(404).json({ message: "Project not found" });
-    res.json(project);
-  } catch (err) {
-    res.status(500).json({ message: err.message });
-  }
-};
+  const getProjectById = async (req, res) => {
+    try {
+      const project = await projectService.getProjectById(req.params.id, req.user.id);
+      if (!project) return res.status(404).json({ message: "Project not found" });
+      res.json(project);
+    } catch (err) {
+      res.status(500).json({ message: err.message });
+    }
+  };
 
 
-const deleteProject = async (req, res) => {
-  try {
-    const project = await projectService.deleteProject(req.params.id, req.user.id);
-    if (!project) return res.status(404).json({ message: "Project not found or not yours" });
+  const deleteProject = async (req, res) => {
+    try {
+      const project = await projectService.deleteProject(req.params.id, req.user.id);
+      if (!project) return res.status(404).json({ message: "Project not found or not yours" });
 
-    res.json({ message: "Project deleted successfully" });
-  } catch (err) {
-    res.status(500).json({ message: err.message });
-  }
-};
+      res.json({ message: "Project deleted successfully" });
+    } catch (err) {
+      res.status(500).json({ message: err.message });
+    }
+  };
 
 
-module.exports = {
-  createProject,
-  getAllProjects,
-  getProjectById,
-  updateProject,
-  deleteProject,
-  getAllPublicProjects,
-  filterProjects,
-  getProjectByIdPublic,
-};
+  module.exports = {
+    createProject,
+    getAllProjects,
+    getProjectById,
+    updateProject,
+    deleteProject,
+    getAllPublicProjects,
+    filterProjects,
+    getProjectByIdPublic,
+  };
