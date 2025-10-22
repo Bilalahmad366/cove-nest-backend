@@ -3,7 +3,12 @@ const mongoose = require("mongoose");
 const projectSchema = new mongoose.Schema(
   {
     project_name: { type: String, required: true },
-    developer_name: { type: String, required: true },
+    // developer_name: { type: String, required: true },
+      developer: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Developer",
+      required: true,
+    },
     city: { type: String, required: true },
     location: { type: String, required: true },
     plan_status: { type: String, required: true },
@@ -18,7 +23,12 @@ const projectSchema = new mongoose.Schema(
       on_handover: { type: String },
       description: { type: String },
     },
-    area: { type: String, required: true },
+    area: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Area",
+      required: true,
+    },
+    
     min_price: { type: String, required: true },
     max_price: { type: String },
     handover: { type: String, required: true },

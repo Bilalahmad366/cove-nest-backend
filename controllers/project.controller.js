@@ -21,14 +21,28 @@ const getProjectByIdPublic = async (req, res) => {
 
 const filterProjects = async (req, res) => {
   try {
-    const projects = await projectService.filterProjects(req.body);
-    res.json(projects);
+    // ✅ Extract filters from body or query
+    const filters = req.body || {};
+
+    // ✅ Call service function
+    const projects = await projectService.filterProjects(filters);
+
+    // ✅ Send response
+    res.status(200).json({
+      success: true,
+      total: projects.length,
+      projects,
+    });
   } catch (err) {
-    res.status(500).json({ message: err.message });
+    console.error("❌ Filter Projects Error:", err.message);
+    res.status(500).json({
+      success: false,
+      message: "Failed to filter projects",
+      error: err.message,
+    });
   }
-};
 
-
+}
 
 // 🟢 Create project
 const createProject = async (req, res) => {

@@ -1,84 +1,99 @@
 const Project = require("../models/project.model");
+const Area = require("../models/area.model");
+const Developer = require("../models/developer.model");
 const fs = require("fs");
 const path = require("path");
 
 const getAllPublicProjects = async () => {
-  return await Project.find().sort({ createdAt: -1 });
+  return await Project.find()
+    .populate("developer", "name")
+    .populate("area", "name")
+    .sort({ createdAt: -1 });
 };
 
 const getProjectByIdPublic = async (id) => {
-  return await Project.findById(id);
+  return await Project.findById(id)
+    .populate("developer", "name")
+    .populate("area", "name");
 };
-
 
 const filterProjects = async (filters) => {
   const query = {};
 
-
-  if (Array.isArray(filters.developer) && filters.developer.length > 0) {
-
-    query.developer_name = {
-      $in: filters.developer
-        .filter(d => d && d.trim() !== "")
-        .map(d => new RegExp(d.trim().replace(/\s+/g, '\\s*'), "i"))  // flexible spacing
-    };
-  }
-
+  // 🔹 Resolve Area Names → ObjectIds
   if (Array.isArray(filters.area) && filters.area.length > 0) {
-    query.area = {
-      $in: filters.area
-        .filter(a => a && a.trim() !== "")
-        // .map(a => new RegExp(`^${a.trim()}$`, "i"))
-        .map(a => new RegExp(a.trim().replace(/\s+/g, '\\s*'), "i"))  // flexible spacing
-    };
+    const areaDocs = await Area.find({
+      name: { $in: filters.area.map((a) => new RegExp(`^${a.trim()}$`, "i")) },
+    }).select("_id");
+    if (areaDocs.length > 0) {
+      query.area = { $in: areaDocs.map((a) => a._id) };
+    }
   }
 
-  if (Array.isArray(filters.handover) && filters.handover.length > 0) {
-    query.handover = {
-      $in: filters.handover
-        .filter(h => h && h.trim() !== "")
-        // .map(h => new RegExp(`^${h.trim()}$`, "i"))
-        .map(h => new RegExp(h.trim().replace(/\s+/g, '\\s*'), "i"))  // flexible spacing
-    };
+  // 🔹 Resolve Developer Names → ObjectIds
+  if (Array.isArray(filters.developer) && filters.developer.length > 0) {
+    const developerDocs = await Developer.find({
+      name: { $in: filters.developer.map((d) => new RegExp(`^${d.trim()}$`, "i")) },
+    }).select("_id");
+    if (developerDocs.length > 0) {
+      query.developer = { $in: developerDocs.map((d) => d._id) };
+    }
   }
 
-  if (Array.isArray(filters.propertyTypes) && filters.propertyTypes.length > 0) {
+
+  // 🔹 Handover filter (array-based)
+  if (filters.handover && filters.handover.length > 0) {
+    query.handover = { $in: filters.handover.map((h) => new RegExp(h, "i")) };
+  }
+
+  // 🔹 Property Type filter (array-based)
+  if (filters.propertyTypes && filters.propertyTypes.length > 0) {
     query.property_type = {
-      $in: filters.propertyTypes
-        .filter(p => p && p.trim() !== "")
-        // .map(p => new RegExp(`^${p.trim()}$`, "i"))
-        .map(p => new RegExp(p.trim().replace(/\s+/g, '\\s*'), "i"))  // flexible spacing
+      $in: filters.propertyTypes.map((type) => new RegExp(type, "i")),
     };
   }
 
-  const min = filters.priceMin && !isNaN(filters.priceMin) ? Number(filters.priceMin) : null;
-  const max = filters.priceMax && !isNaN(filters.priceMax) ? Number(filters.priceMax) : null;
 
-  if (min !== null || max !== null) {
-    query.min_price = { $gte: min || 0 };
-    query.max_price = { $lte: max || Number.MAX_SAFE_INTEGER };
-  }
-
+  // 🔹 Category filter (string)
   if (filters.category && filters.category.trim() !== "") {
-    query.category = new RegExp(`^${filters.category.trim()}$`, "i");
+    query.category = new RegExp(filters.category.trim(), "i");
   }
 
-  // ✅ Best Area (boolean)
+  // 🔹 Plan Status filter (only "Offplan" or "Onplan")
+  if (filters.plan_status && filters.plan_status.length > 0) {
+    const validStatuses = ["Offplan", "Onplan"];
+    const selectedStatuses = filters.plan_status.filter((s) =>
+      validStatuses.includes(s.trim())
+    );
+    if (selectedStatuses.length > 0) {
+      query.plan_status = { $in: selectedStatuses };
+    }
+  }
+
+
+  // 🔹 isBestArea filter (boolean)
   if (typeof filters.isBestArea === "boolean") {
     query.isBestArea = filters.isBestArea;
   }
 
-  if (Array.isArray(filters.plan_status) && filters.plan_status.length > 0) {
-    query.plan_status = {
-      $in: filters.plan_status
-        .filter(p => p && p.trim() !== "")
-        // .map(p => new RegExp(`^${p.trim()}$`, "i"))
-        .map(p => new RegExp(p.trim().replace(/\s+/g, '\\s*'), "i"))  // flexible spacing
-    };
+
+
+  // 🔹 Price range
+  const min = filters.priceMin ? Number(filters.priceMin) : 0;
+  const max = filters.priceMax ? Number(filters.priceMax) : Number.MAX_SAFE_INTEGER;
+  if (min > 0 || max < Number.MAX_SAFE_INTEGER) {
+    query.price = { $gte: min, $lte: max };
   }
 
-  return await Project.find(query).sort({ createdAt: -1 });
+  // 🔹 Final query execution
+  const projects = await Project.find(query)
+    .populate("developer", "name")
+    .populate("area", "name")
+    .sort({ createdAt: -1 });
+
+  return projects;
 };
+
 
 
 const createProject = async (data) => {
@@ -98,7 +113,7 @@ const updateProject = async (id, data, userId) => {
     about_points,
     about_overview,
     project_name,
-    developer_name,
+    developer,
     location,
     city,
     area,
@@ -139,7 +154,7 @@ const updateProject = async (id, data, userId) => {
     project_name,
     about_points,
     about_overview,
-    developer_name,
+    developer,
     location,
     city,
     area,
