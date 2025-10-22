@@ -26,8 +26,11 @@ app.get('/', (req, res) => {
 });
 
 app.use('/api/auth', require('./routes/auth.routes'));
+app.use('/api/info', require('./routes/info.routes'));
 app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 app.use('/api/project',  require('./routes/project.routes'));
+app.use('/api/developer',  require('./routes/developer.routes'));
+app.use('/api/area',  require('./routes/area.routes'));
 app.use('/api/news',  require('./routes/news.routes'));
 app.use('/api/event',  require('./routes/event.routes'));
 app.use('/api/blog',  require('./routes/blog.routes'));
