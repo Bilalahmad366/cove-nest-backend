@@ -1,35 +1,42 @@
 const express = require("express");
 const areaController = require("../controllers/area.controller");
-
-const router = express.Router();
 const upload = require("../middleware/upload");
 
-// router.post("/", upload.single("image"), areaController.create);
-router.get("/", areaController.getAll);
-router.get("/:id", areaController.getById);
-// router.put("/:id", upload.single("image"), areaController.update);
-// backend/routes/area.routes.js
+const router = express.Router();
 
+// ✅ CREATE AREA
 router.post(
   "/",
   upload.fields([
     { name: "image", maxCount: 1 },
-    { name: "section_images", maxCount: 10 } // max 10 sections
+    { name: "section_images", maxCount: 10 },
   ]),
   areaController.create
 );
 
+// ✅ UPDATE AREA
 router.put(
   "/:id",
   upload.fields([
     { name: "image", maxCount: 1 },
-    { name: "section_images", maxCount: 10 }
+    { name: "section_images", maxCount: 10 },
   ]),
   areaController.update
 );
 
+// ✅ GET ALL AREAS
+router.get("/", areaController.getAll);
+
+// ✅ GET AREA BY ID
+router.get("/:id", areaController.getById);
+
+// ✅ GET AREA BY SLUG
+router.get("/:slug", areaController.getBySlug);
+
+// ✅ DELETE AREA
 router.delete("/:id", areaController.remove);
 
-router.get("/:id/projects", areaController.getProjects);
+// ✅ GET PROJECTS BY AREA SLUG
+router.get("/:slug/projects", areaController.getProjectsBySlug);
 
 module.exports = router;

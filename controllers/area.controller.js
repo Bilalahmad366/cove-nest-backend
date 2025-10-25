@@ -37,7 +37,14 @@ const areaController = {
     }
   },
 
- 
+  async getBySlug(req, res) {
+    try {
+      const area = await areaService.getAreaBySlug(req.params.slug);
+      res.status(200).json({ success: true, area });
+    } catch (err) {
+      res.status(404).json({ success: false, message: err.message });
+    }
+  },
 
   async remove(req, res) {
     try {
@@ -48,9 +55,10 @@ const areaController = {
     }
   },
 
-  async getProjects(req, res) {
+  // ✅ Get Projects by Slug
+  async getProjectsBySlug(req, res) {
     try {
-      const { area, projects } = await areaService.getProjectsByArea(req.params.id);
+      const { area, projects } = await areaService.getProjectsBySlug(req.params.slug);
       res.status(200).json({
         success: true,
         area,
@@ -58,7 +66,7 @@ const areaController = {
         projects,
       });
     } catch (err) {
-      res.status(400).json({ success: false, message: err.message });
+      res.status(404).json({ success: false, message: err.message });
     }
   },
 };

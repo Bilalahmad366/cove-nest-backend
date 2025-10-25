@@ -3,8 +3,9 @@ const mongoose = require("mongoose");
 const projectSchema = new mongoose.Schema(
   {
     project_name: { type: String, required: true },
+       slug: { type: String, required: true, unique: true }, 
     // developer_name: { type: String, required: true },
-      developer: {
+    developer: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "Developer",
       required: true,
@@ -14,7 +15,7 @@ const projectSchema = new mongoose.Schema(
     plan_status: { type: String, required: true },
     property_type: { type: String, required: true },
 
-    about_overview: { type: String }, 
+    about_overview: { type: String },
     about_points: [{ type: String }],
     // 🏦 Payment Plans
     payment_plans: {
@@ -28,7 +29,7 @@ const projectSchema = new mongoose.Schema(
       ref: "Area",
       required: true,
     },
-    
+
     min_price: { type: String, required: true },
     max_price: { type: String },
     handover: { type: String, required: true },
