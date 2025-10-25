@@ -1,6 +1,7 @@
 const Project = require("../models/project.model");
 const Area = require("../models/area.model");
 const Developer = require("../models/developer.model");
+const slugify = require("slugify");
 const fs = require("fs");
 const path = require("path");
 
@@ -16,6 +17,13 @@ const getProjectByIdPublic = async (id) => {
     .populate("developer", "name")
     .populate("area", "name");
 };
+
+const getProjectBySlugPublic = async (slug) => {
+  return await Project.findOne({ slug })
+    .populate("developer", "name")
+    .populate("area", "name");
+};
+
 
 const filterProjects = async (filters) => {
   const query = {};
@@ -98,9 +106,11 @@ const filterProjects = async (filters) => {
 
 const createProject = async (data) => {
   const { images, ...rest } = data;
+const slug = slugify(data.project_name, { lower: true, strict: true });
 
   const project = new Project({
     ...rest,
+    slug,
     images: images || [],
   });
 
@@ -174,6 +184,9 @@ const updateProject = async (id, data, userId) => {
     images: [...(images || []), ...(newImages || [])],
   };
 
+  if (project_name && project_name !== project.project_name) {
+  updateData.slug = slugify(project_name, { lower: true, strict: true });
+}
   // ✅ Use $set so nested fields overwrite properly
   return await Project.findOneAndUpdate(
     { _id: id, createdBy: userId },
@@ -223,4 +236,5 @@ module.exports = {
   getAllPublicProjects,
   filterProjects,
   getProjectByIdPublic,
+  getProjectBySlugPublic
 };

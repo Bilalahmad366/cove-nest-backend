@@ -22,6 +22,7 @@ const areaSchema = new mongoose.Schema(
       required: true,
       trim: true,
     },
+     slug: { type: String, required: true, unique: true }, 
     is_featured: {  type: Boolean,  },
     image: {
       url: { type: String },

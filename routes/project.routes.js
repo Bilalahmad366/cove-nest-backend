@@ -8,6 +8,7 @@ const router = express.Router();
 // ✅ Public Routes (No Token Required)
 // =======================
 router.get("/public", projectController.getAllPublicProjects);
+router.get("/public/:slug", projectController.getProjectBySlugPublic);
 router.get("/public/:id", projectController.getProjectByIdPublic);
 router.post("/public/filter", projectController.filterProjects);
 
