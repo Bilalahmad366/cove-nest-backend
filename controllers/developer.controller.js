@@ -28,6 +28,14 @@ const developerController = {
     }
   },
 
+  async getBySlug(req, res) {
+    try {
+      const developer = await developerService.getDeveloperBySlug(req.params.slug);
+      res.status(200).json({ success: true, developer });
+    } catch (err) {
+      res.status(404).json({ success: false, message: err.message });
+    }
+  },
   async update(req, res) {
     try {
       const developer = await developerService.updateDeveloper(req.params.id, req.body, req.file);
@@ -46,23 +54,41 @@ const developerController = {
     }
   },
 
-    // ✅ GET PROJECTS BY DEVELOPER
-async getProjects(req, res) {
-  try {
-    const { developer, projects } = await developerService.getProjectsByDeveloper(req.params.id);
-    res.status(200).json({
-      success: true,
-      developer,
-      totalProjects: projects.length,
-      projects,
-    });
-  } catch (err) {
-    res.status(400).json({
-      success: false,
-      message: err.message || "Failed to fetch projects by developer.",
-    });
-  }
-}
+  // ✅ GET PROJECTS BY DEVELOPER
+  async getProjects(req, res) {
+    try {
+      const { developer, projects } = await developerService.getProjectsByDeveloper(req.params.id);
+      res.status(200).json({
+        success: true,
+        developer,
+        totalProjects: projects.length,
+        projects,
+      });
+    } catch (err) {
+      res.status(400).json({
+        success: false,
+        message: err.message || "Failed to fetch projects by developer.",
+      });
+    }
+
+  },
+
+  // ✅ Get Projects by Slug
+  async getProjectsBySlug(req, res) {
+    try {
+      const { developer, projects } = await developerService.getProjectsBySlug(req.params.slug);
+      res.status(200).json({
+        success: true,
+        developer,
+        totalProjects: projects.length,
+        projects,
+      });
+    } catch (err) {
+      res.status(404).json({ success: false, message: err.message });
+    }
+  },
+
+
 
 };
 

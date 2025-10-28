@@ -17,6 +17,7 @@ const developerSchema = new mongoose.Schema(
       url: { type: String },
       public_id: { type: String },
     },
+    slug: { type: String, required: true, unique: true }, 
     is_featured: { type: Boolean, },
     mapIframe: {
       type: String,

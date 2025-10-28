@@ -1,19 +1,20 @@
 const mongoose = require("mongoose");
 const slugify = require("slugify");
-const Project = require("./models/project.model");
+const Developer = require("./models/developer.model"); // adjust path if needed
 require("dotenv").config();
 
 mongoose.connect(process.env.MONGO_URI, { useNewUrlParser: true, useUnifiedTopology: true })
   .then(async () => {
-    const projects = await Project.find();
-    for (const project of projects) {
-      if (!project.slug) {
-        project.slug = slugify(project.project_name, { lower: true, strict: true });
-        await project.save();
-        console.log(`Slug added: ${project.project_name} => ${project.slug}`);
+    const developers = await Developer.find();
+    for (const developer of developers) {
+      if (!developer.slug) {
+        // Using the developer name to generate slug
+        developer.slug = slugify(developer.name, { lower: true, strict: true });
+        await developer.save();
+        console.log(`Slug added: ${developer.name} => ${developer.slug}`);
       }
     }
-    console.log("All slugs updated!");
+    console.log("All developer slugs updated!");
     process.exit(0);
   })
   .catch(err => {
