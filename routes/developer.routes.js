@@ -7,8 +7,8 @@ const upload = require("../middleware/upload");
 router.post("/", upload.single("image"), developerController.create);
 router.get("/", developerController.getAll);
 // ✅ GET AREA BY SLUG
-router.get("/:slug", developerController.getBySlug);
 router.get("/:id", developerController.getById);
+router.get("/:slug", developerController.getBySlug);
 router.put("/:id", upload.single("image"), developerController.update);
 router.delete("/:id", developerController.remove);
 
