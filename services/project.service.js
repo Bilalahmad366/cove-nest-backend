@@ -48,6 +48,10 @@ const filterProjects = async (filters) => {
     }
   }
 
+// 🔹 Property Name Search (string, partial match)
+if (filters.propertyName && filters.propertyName.trim() !== "") {
+  query.project_name = new RegExp(filters.propertyName.trim(), "i");
+}
 
   // 🔹 Handover filter (array-based)
   if (filters.handover && filters.handover.length > 0) {
@@ -55,12 +59,11 @@ const filterProjects = async (filters) => {
   }
 
   // 🔹 Property Type filter (array-based)
-  if (filters.propertyTypes && filters.propertyTypes.length > 0) {
-    query.property_type = {
-      $in: filters.propertyTypes.map((type) => new RegExp(type, "i")),
-    };
-  }
-
+ if (filters.propertyTypes && filters.propertyTypes.length > 0) {
+  query.property_type = {
+    $in: filters.propertyTypes.map((type) => new RegExp(type, "i")),
+  };
+}
 
   // 🔹 Category filter (string)
   if (filters.category && filters.category.trim() !== "") {
@@ -83,8 +86,6 @@ const filterProjects = async (filters) => {
   if (typeof filters.isBestArea === "boolean") {
     query.isBestArea = filters.isBestArea;
   }
-
-
 
   // 🔹 Price range
   const min = filters.priceMin ? Number(filters.priceMin) : 0;
